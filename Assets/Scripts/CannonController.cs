@@ -7,7 +7,19 @@ public class CannonController : MonoBehaviour
     #region Transform Positions
 
     [SerializeField] Transform firePos;
-    [SerializeField] Transform cannonHolder;
+    public Transform cannonHolder;
+    [SerializeField] List<Transform> cannonsInHolder;
+
+    #endregion
+
+    #region Singleton
+    public static CannonController instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+    }
 
     #endregion
 
@@ -28,6 +40,10 @@ public class CannonController : MonoBehaviour
     [SerializeField] private float maxMovementSpeed;
     [SerializeField] private float maxFirerate;
     [SerializeField] private float maxAmmoAmount;
+
+    [SerializeField] private float MovementSpeedIncreaseAmount;
+    [SerializeField] private float FirerateIncreaseAmount;
+    [SerializeField] private float AmmoAmountIncreaseAmount;
 
     #endregion
 
@@ -102,19 +118,21 @@ public class CannonController : MonoBehaviour
 
     #region Public Functions
 
-    public void IncreaseMovementSpeed(float speed)
+    public void IncreaseMovementSpeed()
     {
-        movementSpeed += speed;
+        movementSpeed += MovementSpeedIncreaseAmount;
     }
 
-    public void IncreaseFireSpeed(float speed)
+    public void IncreaseFireSpeed()
     {
-        firerate += speed;
+        firerate += FirerateIncreaseAmount;
     }
 
-    public void IncreaseAmmoSpeed(float amount)
+    public void IncreaseAmmoAmount()
     {
-        ammoAmount += amount;
+        ammoAmount += AmmoAmountIncreaseAmount;
+        InstantiateBombsPrefabs();
+        _FireCannons();
     }
 
     #endregion
@@ -135,17 +153,30 @@ public class CannonController : MonoBehaviour
 
     void _FireCannons()
     {
-        foreach (Transform bomb in cannonHolder)
+        
+        foreach (Transform cannons in cannonsInHolder)
         {
-            print(bomb);
-            bomb.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
-            bomb.transform.SetParent(null);
+            cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
+            cannons.transform.SetParent(null);
         }
+        //cannonsInHolder = temp;
+        cannonsInHolder.Clear();
+
     }
 
     void InstantiateBombsPrefabs()
     {
         bool turnLeft = true;
+        if (cannonsInHolder.Count > 0)
+        {
+            foreach (Transform cannons in cannonsInHolder)
+            {
+                if (cannons != null)
+                    Destroy(cannons.gameObject);
+            }
+            cannonsInHolder.Clear();
+        }
+        GameObject tempCannon;
         for (int i = 1; i <= ammoAmount; i++)
         {
             if(ammoAmount % 2 == 0)
@@ -154,12 +185,12 @@ public class CannonController : MonoBehaviour
                 {
                     Vector2 pos = new(cannonHolder.transform.position.x- i * cannonPrefab.GetComponent<CircleCollider2D>().radius , 
                         cannonHolder.transform.position.y);
-                    Instantiate(cannonPrefab,pos,Quaternion.identity,cannonHolder);
+                    tempCannon= Instantiate(cannonPrefab,pos,Quaternion.identity,cannonHolder);
                 }
                 else
                 {
                     Vector2 pos = new((i-1) * cannonPrefab.GetComponent<CircleCollider2D>().radius + cannonHolder.transform.position.x , cannonHolder.transform.position.y);
-                    Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
+                    tempCannon=Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
                 }
             }
             else
@@ -168,15 +199,15 @@ public class CannonController : MonoBehaviour
                 {
                     Vector2 pos = new(cannonHolder.transform.position.x - i * cannonPrefab.GetComponent<CircleCollider2D>().radius,
                         cannonHolder.transform.position.y);
-                    Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
+                    tempCannon=Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
                 }
                 else
                 {
                     Vector2 pos = new((i-1) * cannonPrefab.GetComponent<CircleCollider2D>().radius + cannonHolder.transform.position.x, cannonHolder.transform.position.y);
-                    Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
+                    tempCannon=Instantiate(cannonPrefab, pos, Quaternion.identity, cannonHolder);
                 }
             }
-
+            cannonsInHolder.Add(tempCannon.transform);
             turnLeft = !turnLeft;
         }
     }
@@ -189,6 +220,7 @@ public class CannonController : MonoBehaviour
     {
         while (true)
         {
+
             InstantiateBombsPrefabs();
             _FireCannons();
             yield return new WaitForSeconds(firerate);

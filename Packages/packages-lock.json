@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.ramailogames.scoreapi": {
+      "version": "https://gitlab.com/suranjan.redtailfox/scoreapi.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "cc865291e7c72aa45e839c634538b0a582e1f7dc"
+    },
     "com.unity.2d.animation": {
       "version": "7.0.5",
       "depth": 1,

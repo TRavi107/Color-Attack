@@ -46,7 +46,10 @@ public class BombController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (cameraController.instance.CheckTwiceBound(transform.position))
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     #endregion
@@ -72,6 +75,7 @@ public class BombController : MonoBehaviour
     {
         myNumber--;
         rb.AddForce(5 * Vector2.up, ForceMode2D.Impulse);
+        print(rb.velocity.y);
         if (myNumber <= 0)
         {
             if (originalNumber >1 && !divided)

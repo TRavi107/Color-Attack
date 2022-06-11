@@ -36,4 +36,13 @@ public class cameraController : MonoBehaviour
         return false;
     }
 
+    public bool CheckTwiceBound(Vector2 pos)
+    {
+        if (pos.x < leftBound.x*3 || pos.x > rightBound.x*3 || pos.y < bottomBound.y*3 || pos.y > topBound.y*3)
+        {
+            return true;
+        }
+        return false;
+    }
+
 }

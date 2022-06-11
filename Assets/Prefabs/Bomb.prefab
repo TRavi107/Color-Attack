@@ -323,7 +323,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0.5
   m_Material: {fileID: 6200000, guid: 803110b937734ca43871fea4ec5e93e6, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -345,4 +345,3 @@ MonoBehaviour:
   bombPrefabs: {fileID: 1205575227804670044}
   flowingSpeed: 1
   rb: {fileID: 1205575227804670046}
-  myNumber: 0

@@ -15,6 +15,17 @@ public class GameManager : MonoBehaviour
 {
     public bool drawGizmos;
 
+    #region Singleton
+    public static GameManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+    }
+
+    #endregion
+
     #region Transforms
 
     #endregion
@@ -61,7 +72,7 @@ public class GameManager : MonoBehaviour
                 SpawnBombs();
             else
             {
-                PauseGame();
+                UpgradeCannon();
             }
         }
     }
@@ -70,11 +81,18 @@ public class GameManager : MonoBehaviour
 
     #region Private Functions
 
+    void UpgradeCannon()
+    {
+        PauseGame();
+        UIManager.instance.SwitchCanvas(UIPanelType.levelUp);
+        IncreaseLevel();
+    }
+
     void SpawnBombs()
     {
         int spawnIndex = Random.Range(0, spawnPos.Length);
         int dir = Random.Range(0, 2);
-        int force = Random.Range(0, spawnPos[spawnIndex].force);
+        int force = Random.Range(2, 5);
         GameObject bombs = Instantiate(bombPrefab, spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
         int number = Random.Range(1, currentLevel + 1);
         bombs.GetComponent<BombController>().SetNumber(number);
@@ -103,7 +121,7 @@ public class GameManager : MonoBehaviour
 
     public void ResumeGame()
     {
-        Time.timeScale = 1;
+        Time.timeScale = 1f;
         paused = false;
     }
 
