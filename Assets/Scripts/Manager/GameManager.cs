@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
+using RamailoGames;
 
 [System.Serializable]
 public struct SpawnPos
@@ -11,9 +13,26 @@ public struct SpawnPos
     public int force;
 }
 
+public struct Level
+{
+    public int level;
+    public float firerate;
+    public int damageAmmount;
+}
+
 public class GameManager : MonoBehaviour
 {
     public bool drawGizmos;
+
+    #region Tmp Text
+
+    public TMP_Text GameOverScoreText;
+    public TMP_Text GameOverhighscoreText;
+    public TMP_Text congratulationText;
+    public TMP_Text scoreText;
+    public TMP_Text gamePlayhighscoreText;
+
+    #endregion
 
     #region Singleton
     public static GameManager instance;
@@ -27,7 +46,13 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Transforms
+    public Transform levelSpeedUI;
+    public Transform levelAttackUI;
+    public Transform levelAmmoUI;
+    public Transform continueButton;
 
+    public Transform lifeContainer;
+    public Image expImage;
     #endregion
 
     #region Prefabs
@@ -40,10 +65,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SpawnPos[] spawnPos;
     #endregion
 
+
     #region Private Serialized Fields
 
     [SerializeField] float spawnDuration;
     [SerializeField] int currentLevel;
+    [SerializeField] int lifes;
+    [SerializeField] int score;
 
     #endregion
 
@@ -51,6 +79,17 @@ public class GameManager : MonoBehaviour
 
     bool paused;
     int remainingBombs;
+    bool ghostMode;
+    float startTime;
+    int numberInBall = 10;
+
+    #endregion
+
+    #region Public Fields
+
+    public bool maxSpeedReached;
+    public bool maxAmmoReached;
+    public bool maxFireRateReached;
 
     #endregion
 
@@ -59,16 +98,22 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        IncreaseLevel();
+        //IncreaseLevel();
+        lifes = 3;
+        ghostMode = false;
+        score = 0;
+        startTime = Time.unscaledTime;
+        numberInBall = 10;
+        StartCoroutine(nameof(SpawnBombsCouroutine));
     }
 
     // Update is called once per frame
     void Update()
     {
         BombController[] bombsScene = FindObjectsOfType<BombController>();
-        if(bombsScene.Length == 0)
+        if (bombsScene.Length == 0)
         {
-            if(remainingBombs > 0)
+            if (remainingBombs > 0)
                 SpawnBombs();
             else
             {
@@ -77,14 +122,42 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+
+    #endregion
+
+    #region Public Functions
+
+    public void DecreaseLife()
+    {
+        lifes--;
+        if (lifes <= 0)
+        {
+            GameOver();
+        }
+        Destroy(lifeContainer.GetChild(lifeContainer.childCount - 1).gameObject);
+    }
+
     #endregion
 
     #region Private Functions
 
-    void UpgradeCannon()
+    void GameOver()
     {
         PauseGame();
-        UIManager.instance.SwitchCanvas(UIPanelType.levelUp);
+        UIManager.instance.SwitchCanvas(UIPanelType.GameOver);
+        UIManager.instance.SwitchCanvas(UIPanelType.GameOver);
+        //fruitsCutText.text = "Fruits Cut :  " + fruitscut.ToString();
+        GameOverScoreText.text = "Score:          " + score.ToString();
+        //MaxComboText.text = "Max Combo:  " + maxCombo.ToString();
+        int playTime = (int)(Time.unscaledTime - startTime);
+        ScoreAPI.SubmitScore(score, playTime, (bool s, string msg) => { });
+        GetHighScore();
+    }
+
+    void UpgradeCannon()
+    {
+        CannonController.instance.IncreaseFireSpeed();
         IncreaseLevel();
     }
 
@@ -94,8 +167,7 @@ public class GameManager : MonoBehaviour
         int dir = Random.Range(0, 2);
         int force = Random.Range(2, 5);
         GameObject bombs = Instantiate(bombPrefab, spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
-        int number = Random.Range(1, currentLevel + 1);
-        bombs.GetComponent<BombController>().SetNumber(number);
+        bombs.GetComponent<BombController>().SetNumber(numberInBall);
         bombs.GetComponent<BombController>().AddForce(dir == 0 ? Vector2.left : Vector2.right, force);
         remainingBombs--;
     }
@@ -103,7 +175,11 @@ public class GameManager : MonoBehaviour
     void IncreaseLevel()
     {
         currentLevel += 1;
-        remainingBombs = currentLevel + 1;
+        remainingBombs = currentLevel;
+        if (currentLevel == 1)
+            numberInBall = 10;
+        else
+            numberInBall *= 2;
         StopCoroutine(nameof(SpawnBombsCouroutine));
         StartCoroutine(nameof(SpawnBombsCouroutine));
     }
@@ -125,6 +201,53 @@ public class GameManager : MonoBehaviour
         paused = false;
     }
 
+    void setHighScore(TMP_Text highscroreTextUI)
+    {
+        ScoreAPI.GetData((bool s, Data_RequestData d) => {
+            if (s)
+            {
+                if (score >= d.high_score)
+                {
+                    highscroreTextUI.text = score.ToString();
+
+                }
+                else
+                {
+                    highscroreTextUI.text = d.high_score.ToString();
+                }
+
+            }
+        });
+    }
+    public void AddScore(int amount)
+    {
+        score += amount ;
+        scoreText.text = score.ToString();
+        setHighScore(gamePlayhighscoreText);
+    }
+
+
+    void GetHighScore()
+    {
+        ScoreAPI.GetData((bool s, Data_RequestData d) => {
+            if (s)
+            {
+                if (score >= d.high_score)
+                {
+                    GameOverhighscoreText.text = "High Score :    " + score.ToString();
+                    //congratulationText.gameObject.SetActive(true);
+
+                }
+                else
+                {
+                    GameOverhighscoreText.text = "High Score :    " + d.high_score.ToString();
+                }
+
+            }
+        });
+
+    }
+
     #endregion
 
     #region Coroutines
@@ -137,7 +260,7 @@ public class GameManager : MonoBehaviour
             {
                 SpawnBombs();
             }
-            yield return new WaitForSecondsRealtime(spawnDuration);
+            yield return new WaitForSeconds(spawnDuration);
         }
     }
 

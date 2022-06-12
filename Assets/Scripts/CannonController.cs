@@ -1,3 +1,4 @@
+using FirstGearGames.SmoothCameraShaker;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,12 +6,19 @@ using UnityEngine;
 public class CannonController : MonoBehaviour
 {
     #region Transform Positions
+    [SerializeField] CapsuleCollider2D myCollider;
 
     [SerializeField] Transform firePos;
     public Transform cannonHolder;
     [SerializeField] List<Transform> cannonsInHolder;
 
+    public SpriteRenderer[] cannonSprites;
+    public SpriteRenderer cannonMainSprites;
+
     #endregion
+
+    public float traumaAmount;
+    public ShakeData cameraShakeData;
 
     #region Singleton
     public static CannonController instance;
@@ -37,35 +45,16 @@ public class CannonController : MonoBehaviour
     [SerializeField] private float firerate;
     [SerializeField] private float ammoAmount;
 
-    [SerializeField] private float maxMovementSpeed;
     [SerializeField] private float maxFirerate;
-    [SerializeField] private float maxAmmoAmount;
 
-    [SerializeField] private float MovementSpeedIncreaseAmount;
     [SerializeField] private float FirerateIncreaseAmount;
-    [SerializeField] private float AmmoAmountIncreaseAmount;
 
     #endregion
 
     #region Private Fields
 
     bool mouseClicked;
-
-    #endregion
-
-    #region Constructors
-
-    public CannonController()
-    {
-
-    }
-
-    public CannonController(float movementSpeed, float firerate, float ammoAmount)
-    {
-        this.movementSpeed = movementSpeed;
-        this.firerate = firerate;
-        this.ammoAmount = ammoAmount;
-    }
+    bool ghostMode;
 
     #endregion
 
@@ -75,6 +64,7 @@ public class CannonController : MonoBehaviour
     {
         //InstantiateBombsPrefabs();
         StartCoroutine("FireCannons");
+        ghostMode = false;
     }
 
     // Update is called once per frame
@@ -93,14 +83,10 @@ public class CannonController : MonoBehaviour
         if (mouseClicked)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if (mousePos.x < transform.position.x)
-            {
-                MoveLeft();
-            }
-            else if(mousePos.x > transform.position.x)
-            {
-                MoveRight();
-            }
+            Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x - 1, cameraController.instance.rightBound.x + 1);
+            mousePos.x = Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x , cameraController.instance.rightBound.x );
+            Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.deltaTime * movementSpeed);
+            transform.position =new( target.x,transform.position.y);
         }
     }
 
@@ -111,6 +97,14 @@ public class CannonController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (ghostMode)
+            return;
+        if (collision.gameObject.CompareTag("bomb"))
+        {
+            Camera.main.GetComponent<CameraShaker>().Shake(cameraShakeData);
+            StartCoroutine(nameof(GhostMode));
+            GameManager.instance.DecreaseLife();
+        }
         
     }
 
@@ -118,26 +112,35 @@ public class CannonController : MonoBehaviour
 
     #region Public Functions
 
-    public void IncreaseMovementSpeed()
-    {
-        movementSpeed += MovementSpeedIncreaseAmount;
-    }
-
     public void IncreaseFireSpeed()
     {
         firerate += FirerateIncreaseAmount;
+        if (firerate < maxFirerate)
+        {
+            firerate = maxFirerate;
+        }
     }
 
-    public void IncreaseAmmoAmount()
-    {
-        ammoAmount += AmmoAmountIncreaseAmount;
-        InstantiateBombsPrefabs();
-        _FireCannons();
-    }
 
     #endregion
 
     #region Private Functions
+
+    IEnumerator GhostMode()
+    {
+        ghostMode = true;
+        bool isTransparent = false;
+        for (int i = 0; i < 20; i++)
+        {
+            foreach (SpriteRenderer sprite in cannonSprites)
+            {
+                sprite.gameObject.SetActive(isTransparent);
+            }
+            isTransparent = !isTransparent;
+            yield return new WaitForSeconds(0.1f);
+        }
+        ghostMode = false;
+    }
 
     void MoveLeft()
     {
@@ -159,6 +162,7 @@ public class CannonController : MonoBehaviour
             cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
             cannons.transform.SetParent(null);
         }
+        //soundManager.instance.PlaySound(SoundType.shot);
         //cannonsInHolder = temp;
         cannonsInHolder.Clear();
 

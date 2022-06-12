@@ -14,6 +14,8 @@ public class UIManager : MonoBehaviour
     public Slider soundSlider;
     public Slider musicSlider;
 
+    public TMP_Text highscoreText;
+
     private void Awake()
     {
         if (instance == null)
@@ -33,6 +35,7 @@ public class UIManager : MonoBehaviour
         musicSlider.onValueChanged.AddListener(delegate { OnMusicVolumeChanged(); });
 
         soundManager.instance.PlaySound(SoundType.backgroundSound);
+        GetHighScore();
         
     }
     void GetHighScore()
@@ -40,7 +43,7 @@ public class UIManager : MonoBehaviour
         ScoreAPI.GetData((bool s, Data_RequestData d) => {
             if (s)
             {
-                //highscoreText.text = d.high_score.ToString();
+                highscoreText.text = d.high_score.ToString();
             }
         });
     }

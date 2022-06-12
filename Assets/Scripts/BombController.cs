@@ -10,6 +10,8 @@ public class BombController : MonoBehaviour
     #region Prefabs
 
     [SerializeField] GameObject bombPrefabs;
+    [SerializeField] GameObject hitEffects;
+    [SerializeField] GameObject explosionEffects;
 
     #endregion
 
@@ -17,20 +19,20 @@ public class BombController : MonoBehaviour
 
     [SerializeField] private float flowingSpeed;
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] float maxScale;
+    [SerializeField] float minScale;
+    [SerializeField] float scale;
 
     #endregion
 
     #region Private Fields
 
-    bool divided;
     int myNumber;
     int originalNumber;
 
     #endregion
 
     #region Public Fields
-
-
 
     #endregion
 
@@ -39,8 +41,9 @@ public class BombController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        divided = false;
         numberText.text = myNumber.ToString();
+        scale = Random.Range(minScale, maxScale);
+        transform.localScale = scale*Vector2.one;
     }
 
     // Update is called once per frame
@@ -74,27 +77,36 @@ public class BombController : MonoBehaviour
     public void DecreaseNumber()
     {
         myNumber--;
-        rb.AddForce(5 * Vector2.up, ForceMode2D.Impulse);
-        print(rb.velocity.y);
+        //if(rb.velocity.y < 0)
+        //{
+        //    rb.AddForce(10* Vector2.up, ForceMode2D.Impulse);
+        //}
+        GameManager.instance.AddScore(1);
+        soundManager.instance.PlaySound(SoundType.hit);
+        Instantiate(hitEffects, transform.position, Quaternion.identity);
         if (myNumber <= 0)
         {
-            if (originalNumber >1 && !divided)
+            if (originalNumber >10 )
             {
                 bool leftDir = true;
                 for (int i = 0; i < 2; i++)
                 {
                     GameObject bomb = Instantiate(bombPrefabs, transform.position, Quaternion.identity);
                     bomb.GetComponent<BombController>().SetNumber ((originalNumber+1) / 2);
-                    bomb.GetComponent<BombController>().divided = true;
                     if (leftDir)
                         bomb.GetComponent<BombController>().AddForce(Vector2.left, 2);
                     else
                         bomb.GetComponent<BombController>().AddForce(Vector2.right, 2);
 
+                    bomb.GetComponent<BombController>().AddForce(Vector2.up, 2);
                     leftDir = !leftDir;
                 }
             }
             Destroy(this.gameObject);
+            GameManager.instance.AddScore(originalNumber);
+            soundManager.instance.PlaySound(SoundType.explosion);
+            Instantiate(explosionEffects, transform.position, Quaternion.identity);
+
         }
         numberText.text = myNumber.ToString();
     }

@@ -14,6 +14,8 @@ public enum SoundType
     uiSound,
     pauseSound,
     explosion,
+    hit,
+    shot,
 }
 
 
@@ -22,17 +24,19 @@ public class soundManager : MonoBehaviour
     public static soundManager instance;
     public List<AudioClip> mainMenuSound;
     public List<AudioClip> backGroundSound;
-
-    public List<AudioClip> slashEffectSounds;
     public List<AudioClip> uiSounds;
+    public List<AudioClip> shootSound;
+    public List<AudioClip> explosionSound;
+    public List<AudioClip> hitSound;
+
     public AudioClip pauseResumeSound;
-    public AudioClip explosionSound;
     public float backGroundAudioVolume;
     public float soundeffectVolume;
 
     private AudioSource UISoundSource;
     private AudioSource backGroundAudioSource;
-    private AudioSource slashAudioSource;
+    private AudioSource effectSoundSource;
+    private AudioSource shootSoundSource;
 
     private void Awake()
     {
@@ -40,7 +44,7 @@ public class soundManager : MonoBehaviour
         {
             instance = this;
         }
-        //DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);
     }
     void Start()
     {
@@ -48,6 +52,7 @@ public class soundManager : MonoBehaviour
         SoundVolumeChanged(soundeffectVolume);
         ScoreAPI.GameStart((bool s) => {
         });
+        SceneManager.LoadScene(1);
     }
 
     // Update is called once per frame
@@ -125,6 +130,40 @@ public class soundManager : MonoBehaviour
                 UISoundSource.Play();
                 break;
 
+            case SoundType.shot:
+                
+                soundIndex = Random.Range(0, shootSound.Count);
+                clip = shootSound[soundIndex];
+                if (shootSoundSource == null)
+                {
+                    shootSoundSource = gameObject.AddComponent<AudioSource>();
+                }
+                shootSoundSource.clip = clip;
+                shootSoundSource.loop = false;
+                shootSoundSource.Play();
+                break;
+            case SoundType.explosion:
+                soundIndex = Random.Range(0, explosionSound.Count);
+                clip = explosionSound[soundIndex];
+                if (effectSoundSource == null)
+                {
+                    effectSoundSource = gameObject.AddComponent<AudioSource>();
+                }
+                effectSoundSource.clip = clip;
+                effectSoundSource.loop = false;
+                effectSoundSource.Play();
+                break;
+            case SoundType.hit:
+                soundIndex = Random.Range(0, hitSound.Count);
+                clip = hitSound[soundIndex];
+                if (effectSoundSource == null)
+                {
+                    effectSoundSource = gameObject.AddComponent<AudioSource>();
+                }
+                effectSoundSource.clip = clip;
+                effectSoundSource.loop = false;
+                effectSoundSource.Play();
+                break;
             default:
                 break;
         }
@@ -139,9 +178,9 @@ public class soundManager : MonoBehaviour
     }
     public void SoundVolumeChanged(float volume)
     {
-        if (slashAudioSource != null)
+        if (effectSoundSource != null)
         {
-            slashAudioSource.volume = volume;
+            effectSoundSource.volume = volume;
         }
     }
 
