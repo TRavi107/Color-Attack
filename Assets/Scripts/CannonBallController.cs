@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class CannonBallController : MonoBehaviour
 {
+    public GameObject bombEffectPrefab;
     // Start is called before the first frame update
     void Start()
     {
-        
+        Instantiate(bombEffectPrefab, transform.position, Quaternion.identity, transform);
     }
 
     // Update is called once per frame
@@ -23,7 +24,7 @@ public class CannonBallController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("bomb"))
         {
-            collision.gameObject.GetComponent<BombController>().DecreaseNumber();
+            collision.gameObject.GetComponent<BombController>().DecreaseNumber(transform.position);
             Destroy(this.gameObject);
         }
     }

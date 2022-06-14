@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
     #region Prefabs
 
     [SerializeField] GameObject bombPrefab;
-
+    [SerializeField] private GameObject[] powerUps;
     #endregion
 
     #region List of objects
@@ -72,6 +72,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] int currentLevel;
     [SerializeField] int lifes;
     [SerializeField] int score;
+    [Range(0,100)]
+    [SerializeField] int powerUpSpawnChance;
 
     #endregion
 
@@ -99,7 +101,6 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         //IncreaseLevel();
-        lifes = 3;
         ghostMode = false;
         score = 0;
         startTime = Time.unscaledTime;
@@ -163,9 +164,15 @@ public class GameManager : MonoBehaviour
 
     void SpawnBombs()
     {
-        int spawnIndex = Random.Range(0, spawnPos.Length);
+        
         int dir = Random.Range(0, 2);
         int force = Random.Range(2, 5);
+        int spawnIndex = Random.Range(0, spawnPos.Length);
+        if (Random.Range(0, 100) < powerUpSpawnChance)
+        {
+            int powerUpIndex = Random.Range(0, powerUps.Length);
+            GameObject powerUp = Instantiate(powerUps[powerUpIndex], spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
+        }
         GameObject bombs = Instantiate(bombPrefab, spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
         bombs.GetComponent<BombController>().SetNumber(numberInBall);
         bombs.GetComponent<BombController>().AddForce(dir == 0 ? Vector2.left : Vector2.right, force);

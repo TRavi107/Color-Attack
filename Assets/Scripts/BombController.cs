@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class BombController : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class BombController : MonoBehaviour
     [SerializeField] GameObject hitEffects;
     [SerializeField] GameObject explosionEffects;
 
+    [SerializeField] GameObject flarePrefab;
+    [SerializeField] Transform flarePos;
+
     #endregion
 
     #region Serialized Private Fields
@@ -22,6 +26,10 @@ public class BombController : MonoBehaviour
     [SerializeField] float maxScale;
     [SerializeField] float minScale;
     [SerializeField] float scale;
+
+    [SerializeField] float maxRot;
+    [SerializeField] float minRot;
+    [SerializeField] float Rot;
 
     #endregion
 
@@ -43,16 +51,23 @@ public class BombController : MonoBehaviour
     {
         numberText.text = myNumber.ToString();
         scale = Random.Range(minScale, maxScale);
+        Rot = Random.Range(minRot, maxRot);
         transform.localScale = scale*Vector2.one;
+        GameObject flareobj = Instantiate(flarePrefab, flarePos.position, Quaternion.identity, this.transform);
+        flareobj.transform.localScale = 0.2f * Vector2.one;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (cameraController.instance.CheckTwiceBound(transform.position))
+        if (cameraController.instance != null)
         {
-            Destroy(this.gameObject);
+            if (cameraController.instance.CheckTwiceBound(transform.position))
+            {
+                Destroy(this.gameObject);
+            }
         }
+        transform.Rotate(new Vector3(0, 0, Rot*Time.deltaTime));
     }
 
     #endregion
@@ -74,7 +89,20 @@ public class BombController : MonoBehaviour
         rb.AddForce(totalforce * direction, ForceMode2D.Impulse);
     }
 
-    public void DecreaseNumber()
+    public void manualDestroy()
+    {
+        Instantiate(explosionEffects, transform.position, Quaternion.identity);
+        this.gameObject.SetActive(false);
+        soundManager.instance.PlaySound(SoundType.explosion);
+        Invoke(nameof(ChangeScene), 0.7f);
+    }
+
+    void ChangeScene()
+    {
+        SceneManager.LoadScene(2);
+    }
+
+    public void DecreaseNumber(Vector2 position)
     {
         myNumber--;
         //if(rb.velocity.y < 0)
@@ -83,7 +111,7 @@ public class BombController : MonoBehaviour
         //}
         GameManager.instance.AddScore(1);
         soundManager.instance.PlaySound(SoundType.hit);
-        Instantiate(hitEffects, transform.position, Quaternion.identity);
+        Instantiate(hitEffects, position, Quaternion.identity);
         if (myNumber <= 0)
         {
             if (originalNumber >10 )

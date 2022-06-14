@@ -7,6 +7,7 @@ using RamailoGames;
 
 public class UIManager : MonoBehaviour
 {
+    public BombController mainMenuBomb;
     public static UIManager instance;
     public List<UIPanel> uiPanels;
 
@@ -82,4 +83,9 @@ public class UIManager : MonoBehaviour
         soundManager.instance.SaveSoundVoulme(soundSlider.value);
     }
 
+
+    public void PlayGame()
+    {
+        mainMenuBomb.manualDestroy();
+    }
 }

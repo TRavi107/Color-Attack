@@ -10,6 +10,8 @@ public class CannonController : MonoBehaviour
 
     [SerializeField] Transform firePos;
     public Transform cannonHolder;
+    public Transform effectPos;
+    public Transform poofPos;
     [SerializeField] List<Transform> cannonsInHolder;
 
     public SpriteRenderer[] cannonSprites;
@@ -19,6 +21,9 @@ public class CannonController : MonoBehaviour
 
     public float traumaAmount;
     public ShakeData cameraShakeData;
+    public ShakeData cameraMIniShakeData;
+    public GameObject cannonShotEffectPrefab;
+    public GameObject cannonPoofEffectPrefab;
 
     #region Singleton
     public static CannonController instance;
@@ -48,6 +53,7 @@ public class CannonController : MonoBehaviour
     [SerializeField] private float maxFirerate;
 
     [SerializeField] private float FirerateIncreaseAmount;
+    [SerializeField] private float wheelRadius;
 
     #endregion
 
@@ -86,7 +92,10 @@ public class CannonController : MonoBehaviour
             Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x - 1, cameraController.instance.rightBound.x + 1);
             mousePos.x = Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x , cameraController.instance.rightBound.x );
             Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.deltaTime * movementSpeed);
+            Vector2 previousPos = transform.position;
             transform.position =new( target.x,transform.position.y);
+            Vector2 newPos = transform.position;
+            AnimateWheels(previousPos, newPos);
         }
     }
 
@@ -126,20 +135,13 @@ public class CannonController : MonoBehaviour
 
     #region Private Functions
 
-    IEnumerator GhostMode()
+    void AnimateWheels(Vector2 previous,Vector2 newPos)
     {
-        ghostMode = true;
-        bool isTransparent = false;
-        for (int i = 0; i < 20; i++)
+        for (int i = 1; i < cannonSprites.Length; i++)
         {
-            foreach (SpriteRenderer sprite in cannonSprites)
-            {
-                sprite.gameObject.SetActive(isTransparent);
-            }
-            isTransparent = !isTransparent;
-            yield return new WaitForSeconds(0.1f);
+            float angle = Mathf.Rad2Deg*(newPos.x - previous.x) / (2 * Mathf.PI * wheelRadius);
+            cannonSprites[i].transform.Rotate(new Vector3(0, 0, angle));
         }
-        ghostMode = false;
     }
 
     void MoveLeft()
@@ -160,12 +162,28 @@ public class CannonController : MonoBehaviour
         foreach (Transform cannons in cannonsInHolder)
         {
             cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
+            StartCoroutine("cannonShake");
+
             cannons.transform.SetParent(null);
         }
+        Instantiate(cannonPoofEffectPrefab, effectPos.position, Quaternion.identity);
         //soundManager.instance.PlaySound(SoundType.shot);
         //cannonsInHolder = temp;
         cannonsInHolder.Clear();
 
+    }
+
+    IEnumerator cannonShake()
+    {
+        cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y - 0.02f);
+        yield return new WaitForSeconds(0.05f);
+        cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y + 0.02f);
+        yield return new WaitForSeconds(0.05f);
+        cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y + 0.01f);
+        yield return new WaitForSeconds(0.05f);
+        cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y - 0.01f);
+        yield return new WaitForSeconds(0.05f);
+        
     }
 
     void InstantiateBombsPrefabs()
@@ -229,6 +247,22 @@ public class CannonController : MonoBehaviour
             _FireCannons();
             yield return new WaitForSeconds(firerate);
         }
+    }
+
+    IEnumerator GhostMode()
+    {
+        ghostMode = true;
+        bool isTransparent = false;
+        for (int i = 0; i < 20; i++)
+        {
+            foreach (SpriteRenderer sprite in cannonSprites)
+            {
+                sprite.gameObject.SetActive(isTransparent);
+            }
+            isTransparent = !isTransparent;
+            yield return new WaitForSeconds(0.1f);
+        }
+        ghostMode = false;
     }
 
     #endregion
