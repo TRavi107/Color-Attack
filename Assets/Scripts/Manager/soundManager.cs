@@ -50,8 +50,7 @@ public class soundManager : MonoBehaviour
     {
         MusicVolumeChanged(backGroundAudioVolume);
         SoundVolumeChanged(soundeffectVolume);
-        ScoreAPI.GameStart((bool s) => {
-        });
+        
         SceneManager.LoadScene(1);
     }
 

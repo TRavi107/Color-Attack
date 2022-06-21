@@ -46,10 +46,6 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Transforms
-    public Transform levelSpeedUI;
-    public Transform levelAttackUI;
-    public Transform levelAmmoUI;
-    public Transform continueButton;
 
     public Transform lifeContainer;
     public Image expImage;
@@ -88,10 +84,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Public Fields
-
-    public bool maxSpeedReached;
-    public bool maxAmmoReached;
-    public bool maxFireRateReached;
+    public int cannonDamageAmount;
 
     #endregion
 
@@ -106,6 +99,8 @@ public class GameManager : MonoBehaviour
         startTime = Time.unscaledTime;
         numberInBall = 10;
         StartCoroutine(nameof(SpawnBombsCouroutine));
+        ScoreAPI.GameStart((bool s) => {
+        });
     }
 
     // Update is called once per frame
@@ -138,6 +133,17 @@ public class GameManager : MonoBehaviour
         }
         Destroy(lifeContainer.GetChild(lifeContainer.childCount - 1).gameObject);
     }
+    public void SlowTime(float amount,float duration)
+    {
+        Time.timeScale = amount;
+        StartCoroutine(nameof(restoreTime), duration);
+    }
+
+    IEnumerator restoreTime(float duration)
+    {
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1;
+    }
 
     #endregion
 
@@ -149,7 +155,7 @@ public class GameManager : MonoBehaviour
         UIManager.instance.SwitchCanvas(UIPanelType.GameOver);
         UIManager.instance.SwitchCanvas(UIPanelType.GameOver);
         //fruitsCutText.text = "Fruits Cut :  " + fruitscut.ToString();
-        GameOverScoreText.text = "Score:          " + score.ToString();
+        GameOverScoreText.text = "Score:            " + score.ToString();
         //MaxComboText.text = "Max Combo:  " + maxCombo.ToString();
         int playTime = (int)(Time.unscaledTime - startTime);
         ScoreAPI.SubmitScore(score, playTime, (bool s, string msg) => { });
@@ -168,15 +174,27 @@ public class GameManager : MonoBehaviour
         int dir = Random.Range(0, 2);
         int force = Random.Range(2, 5);
         int spawnIndex = Random.Range(0, spawnPos.Length);
-        if (Random.Range(0, 100) < powerUpSpawnChance)
+        
+
+        if (Random.Range(0, 100) < powerUpSpawnChance && currentLevel>=3)
         {
-            int powerUpIndex = Random.Range(0, powerUps.Length);
-            GameObject powerUp = Instantiate(powerUps[powerUpIndex], spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
+            if (GameObject.Find("slowBomb") == null)
+            {
+                int powerUpIndex = Random.Range(0, powerUps.Length);
+                GameObject powerUp = Instantiate(powerUps[powerUpIndex], spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
+                powerUp.GetComponent<BombController>().SetNumber(numberInBall/2);
+                powerUp.GetComponent<BombController>().AddForce(dir == 0 ? Vector2.left : Vector2.right, force);
+                powerUp.GetComponent<BombController>().isPowerUP = true;
+            }
         }
-        GameObject bombs = Instantiate(bombPrefab, spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
-        bombs.GetComponent<BombController>().SetNumber(numberInBall);
-        bombs.GetComponent<BombController>().AddForce(dir == 0 ? Vector2.left : Vector2.right, force);
+        else
+        {
+            GameObject bombs = Instantiate(bombPrefab, spawnPos[spawnIndex].spawnPosition.position, Quaternion.identity);
+            bombs.GetComponent<BombController>().SetNumber(numberInBall);
+            bombs.GetComponent<BombController>().AddForce(dir == 0 ? Vector2.left : Vector2.right, force);
+        }
         remainingBombs--;
+
     }
 
     void IncreaseLevel()
@@ -184,9 +202,17 @@ public class GameManager : MonoBehaviour
         currentLevel += 1;
         remainingBombs = currentLevel;
         if (currentLevel == 1)
+        {
             numberInBall = 10;
+            cannonDamageAmount = 1;
+        }
         else
+        {
             numberInBall *= 2;
+            cannonDamageAmount +=2;
+        }
+
+
         StopCoroutine(nameof(SpawnBombsCouroutine));
         StartCoroutine(nameof(SpawnBombsCouroutine));
     }
@@ -241,13 +267,13 @@ public class GameManager : MonoBehaviour
             {
                 if (score >= d.high_score)
                 {
-                    GameOverhighscoreText.text = "High Score :    " + score.ToString();
-                    //congratulationText.gameObject.SetActive(true);
+                    GameOverhighscoreText.text = "High Score : " + score.ToString();
+                    congratulationText.gameObject.SetActive(true);
 
                 }
                 else
                 {
-                    GameOverhighscoreText.text = "High Score :    " + d.high_score.ToString();
+                    GameOverhighscoreText.text = "High Score : " + d.high_score.ToString();
                 }
 
             }
@@ -267,7 +293,7 @@ public class GameManager : MonoBehaviour
             {
                 SpawnBombs();
             }
-            yield return new WaitForSeconds(spawnDuration);
+            yield return new WaitForSecondsRealtime(spawnDuration);
         }
     }
 

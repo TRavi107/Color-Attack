@@ -4,9 +4,24 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+public enum colorName
+{
+    red,
+    yellow,
+    orange,
+    green,
+    brown,
+    blue,
+    purple,
+    random,
+}
+
+
+
 public class BombController : MonoBehaviour
 {
     public TMP_Text numberText;
+    public SpriteRenderer spriteRenderer;
 
     #region Prefabs
 
@@ -37,6 +52,8 @@ public class BombController : MonoBehaviour
 
     int myNumber;
     int originalNumber;
+    public bool isSplited;
+    public bool isPowerUP;
 
     #endregion
 
@@ -102,9 +119,10 @@ public class BombController : MonoBehaviour
         SceneManager.LoadScene(2);
     }
 
-    public void DecreaseNumber(Vector2 position)
+    [System.Obsolete]
+    public void DecreaseNumber(Vector2 position,int damage)
     {
-        myNumber--;
+        myNumber -= damage;
         //if(rb.velocity.y < 0)
         //{
         //    rb.AddForce(10* Vector2.up, ForceMode2D.Impulse);
@@ -114,29 +132,39 @@ public class BombController : MonoBehaviour
         Instantiate(hitEffects, position, Quaternion.identity);
         if (myNumber <= 0)
         {
-            if (originalNumber >10 )
+            if (!isPowerUP)
             {
-                bool leftDir = true;
-                for (int i = 0; i < 2; i++)
+                if (originalNumber > 10 && !isSplited)
                 {
-                    GameObject bomb = Instantiate(bombPrefabs, transform.position, Quaternion.identity);
-                    bomb.GetComponent<BombController>().SetNumber ((originalNumber+1) / 2);
-                    if (leftDir)
-                        bomb.GetComponent<BombController>().AddForce(Vector2.left, 2);
-                    else
-                        bomb.GetComponent<BombController>().AddForce(Vector2.right, 2);
+                    bool leftDir = true;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        GameObject bomb = Instantiate(bombPrefabs, transform.position, Quaternion.identity);
+                        bomb.GetComponent<BombController>().SetNumber((originalNumber + 1) / 2);
+                        if (leftDir)
+                            bomb.GetComponent<BombController>().AddForce(Vector2.left, 2);
+                        else
+                            bomb.GetComponent<BombController>().AddForce(Vector2.right, 2);
 
-                    bomb.GetComponent<BombController>().AddForce(Vector2.up, 2);
-                    leftDir = !leftDir;
+                        bomb.GetComponent<BombController>().AddForce(Vector2.up, 2);
+                        bomb.GetComponent<BombController>().isSplited = true;
+                        leftDir = !leftDir;
+                    }
                 }
+            }
+            else
+            {
+                GameManager.instance.SlowTime(0.4f, 3);
             }
             Destroy(this.gameObject);
             GameManager.instance.AddScore(originalNumber);
             soundManager.instance.PlaySound(SoundType.explosion);
-            Instantiate(explosionEffects, transform.position, Quaternion.identity);
+            GameObject effect =Instantiate(explosionEffects, transform.position, Quaternion.identity);
+            Transform smoke=effect.transform.GetChild(2);
+            
 
-        }
-        numberText.text = myNumber.ToString();
+            }
+            numberText.text = myNumber.ToString();
     }
 
     #endregion

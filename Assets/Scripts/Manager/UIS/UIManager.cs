@@ -36,7 +36,8 @@ public class UIManager : MonoBehaviour
         musicSlider.onValueChanged.AddListener(delegate { OnMusicVolumeChanged(); });
 
         soundManager.instance.PlaySound(SoundType.backgroundSound);
-        GetHighScore();
+        if(highscoreText!=null)
+            GetHighScore();
         
     }
     void GetHighScore()

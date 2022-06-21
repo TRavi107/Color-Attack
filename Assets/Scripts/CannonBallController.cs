@@ -5,6 +5,7 @@ using UnityEngine;
 public class CannonBallController : MonoBehaviour
 {
     public GameObject bombEffectPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,7 +25,7 @@ public class CannonBallController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("bomb"))
         {
-            collision.gameObject.GetComponent<BombController>().DecreaseNumber(transform.position);
+            collision.gameObject.GetComponent<BombController>().DecreaseNumber(transform.position,GameManager.instance.cannonDamageAmount);
             Destroy(this.gameObject);
         }
     }

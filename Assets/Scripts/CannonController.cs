@@ -91,7 +91,7 @@ public class CannonController : MonoBehaviour
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x - 1, cameraController.instance.rightBound.x + 1);
             mousePos.x = Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x , cameraController.instance.rightBound.x );
-            Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.deltaTime * movementSpeed);
+            Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.unscaledDeltaTime * movementSpeed);
             Vector2 previousPos = transform.position;
             transform.position =new( target.x,transform.position.y);
             Vector2 newPos = transform.position;
@@ -110,9 +110,13 @@ public class CannonController : MonoBehaviour
             return;
         if (collision.gameObject.CompareTag("bomb"))
         {
-            Camera.main.GetComponent<CameraShaker>().Shake(cameraShakeData);
-            StartCoroutine(nameof(GhostMode));
-            GameManager.instance.DecreaseLife();
+            if (!collision.gameObject.GetComponent<BombController>().isPowerUP)
+            {
+                Camera.main.GetComponent<CameraShaker>().Shake(cameraShakeData);
+                StartCoroutine(nameof(GhostMode));
+                GameManager.instance.DecreaseLife();
+            }
+            
         }
         
     }
@@ -162,11 +166,13 @@ public class CannonController : MonoBehaviour
         foreach (Transform cannons in cannonsInHolder)
         {
             cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
+            cannons.gameObject.GetComponent<Rigidbody2D>().mass=Time.timeScale;
             StartCoroutine("cannonShake");
 
             cannons.transform.SetParent(null);
         }
         Instantiate(cannonPoofEffectPrefab, effectPos.position, Quaternion.identity);
+        Instantiate(cannonShotEffectPrefab, effectPos.position, Quaternion.identity);
         //soundManager.instance.PlaySound(SoundType.shot);
         //cannonsInHolder = temp;
         cannonsInHolder.Clear();
@@ -176,13 +182,13 @@ public class CannonController : MonoBehaviour
     IEnumerator cannonShake()
     {
         cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y - 0.02f);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSecondsRealtime(0.05f);
         cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y + 0.02f);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSecondsRealtime(0.05f);
         cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y + 0.01f);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSecondsRealtime(0.05f);
         cannonMainSprites.transform.position = new Vector2(cannonMainSprites.transform.position.x, cannonMainSprites.transform.position.y - 0.01f);
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSecondsRealtime(0.05f);
         
     }
 
@@ -245,7 +251,7 @@ public class CannonController : MonoBehaviour
 
             InstantiateBombsPrefabs();
             _FireCannons();
-            yield return new WaitForSeconds(firerate);
+            yield return new WaitForSecondsRealtime(firerate);
         }
     }
 
@@ -260,7 +266,7 @@ public class CannonController : MonoBehaviour
                 sprite.gameObject.SetActive(isTransparent);
             }
             isTransparent = !isTransparent;
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSecondsRealtime(0.1f);
         }
         ghostMode = false;
     }
