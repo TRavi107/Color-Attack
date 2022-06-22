@@ -215,6 +215,83 @@ MonoBehaviour:
   maxFirerate: 0.07
   FirerateIncreaseAmount: -0.05
   wheelRadius: 0.1
+--- !u!1 &80884722
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 80884723}
+  - component: {fileID: 80884725}
+  - component: {fileID: 80884724}
+  m_Layer: 5
+  m_Name: clock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &80884723
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 80884722}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 870619865}
+  m_Father: {fileID: 1366766904}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -71.04, y: -197.89}
+  m_SizeDelta: {x: 72.08, y: 67.78}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &80884724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 80884722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 38aae9d056e30064d936b9aecb8e34a9, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &80884725
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 80884722}
+  m_CullTransparentMesh: 1
 --- !u!1 &107188985
 GameObject:
   m_ObjectHideFlags: 0
@@ -2042,6 +2119,82 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.1
+--- !u!1 &870619864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 870619865}
+  - component: {fileID: 870619867}
+  - component: {fileID: 870619866}
+  m_Layer: 5
+  m_Name: clockline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &870619865
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870619864}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 80884723}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 7.14, y: 21.77}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &870619866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870619864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 541a355e217243541b84ef256ba293b9, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &870619867
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870619864}
+  m_CullTransparentMesh: 1
 --- !u!114 &905990669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3619,6 +3772,7 @@ RectTransform:
   - {fileID: 5719128413651147734}
   - {fileID: 4798354964518903382}
   - {fileID: 698616577}
+  - {fileID: 80884723}
   m_Father: {fileID: 406167755}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4365,6 +4519,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8372cf98143e631408e3b92e3dd4fe85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tutorialWindows: []
+  tutorialWindowsButton: []
+  notSelectedSprite: {fileID: 0}
+  selectedSprite: {fileID: 0}
   mainMenuBomb: {fileID: 0}
   uiPanels:
   - {fileID: 1366766905}
@@ -4963,6 +5121,7 @@ MonoBehaviour:
   gamePlayhighscoreText: {fileID: 1720143296713825869}
   lifeContainer: {fileID: 1910041349}
   expImage: {fileID: 0}
+  clockImage: {fileID: 80884723}
   bombPrefab: {fileID: 1205575227804670044, guid: 8c254776a21a6cd46883b7a32283a7ff, type: 3}
   powerUps:
   - {fileID: 1205575227804670044, guid: f31ea1998fb70aa408097aedad039329, type: 3}
@@ -4981,8 +5140,10 @@ MonoBehaviour:
   currentLevel: 0
   lifes: 3
   score: 0
-  powerUpSpawnChance: 20
+  powerUpSpawnChance: 10
   cannonDamageAmount: 0
+  effectCanvas: {fileID: 406167754}
+  ComboObjPrefab: {fileID: 8252340678532523217, guid: 0979a236775ec0b4ab56c55d9a5c569c, type: 3}
 --- !u!4 &2016648591
 Transform:
   m_ObjectHideFlags: 0
@@ -5497,7 +5658,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &296535968302337093
 RectTransform:
   m_ObjectHideFlags: 0

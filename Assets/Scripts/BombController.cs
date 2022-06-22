@@ -155,6 +155,7 @@ public class BombController : MonoBehaviour
             else
             {
                 GameManager.instance.SlowTime(0.4f, 3);
+                GameManager.instance.ShowCombo(transform.position, "Time Slowed");
             }
             Destroy(this.gameObject);
             GameManager.instance.AddScore(originalNumber);

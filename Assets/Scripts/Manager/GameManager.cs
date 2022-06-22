@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
 
     public Transform lifeContainer;
     public Image expImage;
+    public Transform clockImage;
     #endregion
 
     #region Prefabs
@@ -85,6 +86,11 @@ public class GameManager : MonoBehaviour
 
     #region Public Fields
     public int cannonDamageAmount;
+    public Canvas effectCanvas;
+
+    public GameObject ComboObjPrefab;
+
+    private GameObject comboSpwaned;
 
     #endregion
 
@@ -116,6 +122,10 @@ public class GameManager : MonoBehaviour
                 UpgradeCannon();
             }
         }
+        if (clockImage.gameObject.activeInHierarchy)
+        {
+            clockImage.GetChild(0).transform.Rotate(new Vector3(0, 0, -120 *Time.unscaledDeltaTime));
+        }
     }
 
 
@@ -135,6 +145,8 @@ public class GameManager : MonoBehaviour
     }
     public void SlowTime(float amount,float duration)
     {
+        clockImage.gameObject.SetActive(true);
+        clockImage.gameObject.transform.rotation = Quaternion.identity;
         Time.timeScale = amount;
         StartCoroutine(nameof(restoreTime), duration);
     }
@@ -142,13 +154,40 @@ public class GameManager : MonoBehaviour
     IEnumerator restoreTime(float duration)
     {
         yield return new WaitForSecondsRealtime(duration);
+        clockImage.gameObject.SetActive(false);
         Time.timeScale = 1;
     }
 
     #endregion
 
     #region Private Functions
+    public void ShowCombo(Vector3 pos, string combotext)
+    {
+        StopCoroutine("AutoDisableCombo");
+        if (comboSpwaned == null)
+            comboSpwaned = Instantiate(ComboObjPrefab, effectCanvas.transform);
+        EnableCombo();
+        comboSpwaned.transform.position = pos;
+        comboSpwaned.GetComponent<TMP_Text>().text = combotext;
+        StartCoroutine("AutoDisableCombo");
+    }
+    void DisableCombo()
+    {
+        if (comboSpwaned != null)
+            comboSpwaned.SetActive(false);
+    }
+    void EnableCombo()
+    {
+        if (comboSpwaned != null)
+            comboSpwaned.SetActive(true);
+    }
 
+    IEnumerator AutoDisableCombo()
+    {
+        yield return new WaitForSecondsRealtime(1);
+        DisableCombo();
+        // Code to execute after the delay
+    }
     void GameOver()
     {
         PauseGame();

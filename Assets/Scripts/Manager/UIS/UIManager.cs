@@ -7,6 +7,10 @@ using RamailoGames;
 
 public class UIManager : MonoBehaviour
 {
+    public GameObject[] tutorialWindows;
+    public Button[] tutorialWindowsButton;
+    public Sprite notSelectedSprite;
+    public Sprite selectedSprite;
     public BombController mainMenuBomb;
     public static UIManager instance;
     public List<UIPanel> uiPanels;
@@ -69,6 +73,25 @@ public class UIManager : MonoBehaviour
         }
         
         activeUIPanel.gameObject.SetActive(true);
+    }
+
+    public void ActivateTutorialWindows(int winIndex)
+    {
+        int index = 0;
+        foreach (GameObject item in tutorialWindows)
+        {
+            if (index == winIndex)
+            {
+                item.SetActive(true);
+                tutorialWindowsButton[index].image.sprite = selectedSprite;
+            }
+            else
+            {
+                item.SetActive(false);
+                tutorialWindowsButton[index].image.sprite = notSelectedSprite;
+            }
+            index++;
+        }
     }
 
     public void OnMusicVolumeChanged()
