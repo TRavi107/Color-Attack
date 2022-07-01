@@ -12,6 +12,8 @@ public class CannonController : MonoBehaviour
     public Transform cannonHolder;
     public Transform effectPos;
     public Transform poofPos;
+    public Transform leftbound;
+    public Transform rightbound;
     [SerializeField] List<Transform> cannonsInHolder;
 
     public SpriteRenderer[] cannonSprites;
@@ -90,12 +92,15 @@ public class CannonController : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x - 1, cameraController.instance.rightBound.x + 1);
-            mousePos.x = Mathf.Clamp(mousePos.x, cameraController.instance.leftBound.x , cameraController.instance.rightBound.x );
-            Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.unscaledDeltaTime * movementSpeed);
-            Vector2 previousPos = transform.position;
-            transform.position =new( target.x,transform.position.y);
-            Vector2 newPos = transform.position;
-            AnimateWheels(previousPos, newPos);
+            mousePos.x = Mathf.Clamp(mousePos.x, leftbound.position.x , rightbound.position.x );
+            if (Time.timeScale != 0)
+            {
+                Vector2 target = Vector2.Lerp(transform.position, mousePos, Time.unscaledDeltaTime * movementSpeed);
+                Vector2 previousPos = transform.position;
+                transform.position = new(target.x, transform.position.y);
+                Vector2 newPos = transform.position;
+                AnimateWheels(previousPos, newPos);
+            }
         }
     }
 
