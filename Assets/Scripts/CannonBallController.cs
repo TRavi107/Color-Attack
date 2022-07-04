@@ -5,6 +5,7 @@ using UnityEngine;
 public class CannonBallController : MonoBehaviour
 {
     public GameObject bombEffectPrefab;
+    public float cannonForce;
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +20,7 @@ public class CannonBallController : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+        transform.position = new Vector3(transform.position.x, transform.position.y + 10 * Time.unscaledDeltaTime, 0);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

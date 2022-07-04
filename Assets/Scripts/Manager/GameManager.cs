@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
         }
         if (clockImage.gameObject.activeInHierarchy)
         {
-            clockImage.GetChild(0).transform.Rotate(new Vector3(0, 0, -120 *Time.unscaledDeltaTime));
+            clockImage.GetChild(0).transform.Rotate(new Vector3(0, 0, -72 *Time.unscaledDeltaTime));
         }
     }
 
@@ -148,6 +148,7 @@ public class GameManager : MonoBehaviour
         clockImage.gameObject.SetActive(true);
         clockImage.gameObject.transform.rotation = Quaternion.identity;
         Time.timeScale = amount;
+        Time.fixedDeltaTime = amount * Time.deltaTime;
         StartCoroutine(nameof(restoreTime), duration);
     }
 
@@ -156,6 +157,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(duration);
         clockImage.gameObject.SetActive(false);
         Time.timeScale = 1;
+        Time.fixedDeltaTime = Time.deltaTime;
     }
 
     #endregion

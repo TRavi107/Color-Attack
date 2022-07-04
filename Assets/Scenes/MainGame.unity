@@ -696,7 +696,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 818.0362, y: -204.16922}
+  m_AnchoredPosition: {x: 818.03613, y: -204.16922}
   m_SizeDelta: {x: 1636.0724, y: 408.33844}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &552499016392561901
@@ -2119,7 +2119,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 818.0362, y: -612.5077}
+  m_AnchoredPosition: {x: 818.03613, y: -612.5077}
   m_SizeDelta: {x: 1636.0724, y: 408.33844}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &552499017941431207
@@ -8700,7 +8700,7 @@ MonoBehaviour:
   movementSpeed: 6
   firerate: 0.3
   ammoAmount: 1
-  maxFirerate: 0.07
+  maxFirerate: 0.1
   FirerateIncreaseAmount: -0.05
   wheelRadius: 0.1
 --- !u!1 &6964595138437045922
@@ -9100,7 +9100,7 @@ MonoBehaviour:
   currentLevel: 0
   lifes: 3
   score: 0
-  powerUpSpawnChance: 0
+  powerUpSpawnChance: 10
   cannonDamageAmount: 0
   effectCanvas: {fileID: 5747475146445748654}
   ComboObjPrefab: {fileID: 8252340678532523217, guid: 0979a236775ec0b4ab56c55d9a5c569c, type: 3}

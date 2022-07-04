@@ -170,11 +170,11 @@ public class CannonController : MonoBehaviour
         
         foreach (Transform cannons in cannonsInHolder)
         {
-            cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
-            cannons.gameObject.GetComponent<Rigidbody2D>().mass=Time.timeScale;
+            //cannons.gameObject.GetComponent<Rigidbody2D>().AddForce(cannonForce * transform.up,ForceMode2D.Force);
+            //cannons.gameObject.GetComponent<Rigidbody2D>().mass=Time.timeScale;
             StartCoroutine("cannonShake");
-
             cannons.transform.SetParent(null);
+            cannons.GetComponent<CannonBallController>().cannonForce = cannonForce;
         }
         Instantiate(cannonPoofEffectPrefab, effectPos.position, Quaternion.identity);
         Instantiate(cannonShotEffectPrefab, effectPos.position, Quaternion.identity);
