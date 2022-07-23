@@ -162,7 +162,7 @@ public class BombController : MonoBehaviour
             soundManager.instance.PlaySound(SoundType.explosion);
             GameObject effect =Instantiate(explosionEffects, transform.position, Quaternion.identity);
             Transform smoke=effect.transform.GetChild(2);
-            
+            //GameManager.instance.AddLife();
 
             }
             numberText.text = myNumber.ToString();

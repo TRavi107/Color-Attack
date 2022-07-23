@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
 
     #region Transforms
 
-    public Transform lifeContainer;
+    public Transform[] lifeContainer;
     public Image expImage;
     public Transform clockImage;
     #endregion
@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject bombPrefab;
     [SerializeField] private GameObject[] powerUps;
+    [SerializeField] private GameObject livePrefab;
     #endregion
 
     #region List of objects
@@ -71,6 +72,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] int score;
     [Range(0,100)]
     [SerializeField] int powerUpSpawnChance;
+    [SerializeField] int maxLife;
 
     #endregion
 
@@ -91,7 +93,7 @@ public class GameManager : MonoBehaviour
     public GameObject ComboObjPrefab;
 
     private GameObject comboSpwaned;
-
+    public float highscore;
     #endregion
 
     #region MonoBehaviour Functions
@@ -106,6 +108,17 @@ public class GameManager : MonoBehaviour
         numberInBall = 10;
         StartCoroutine(nameof(SpawnBombsCouroutine));
         ScoreAPI.GameStart((bool s) => {
+        });
+        lifes = 0;
+        for (int i = 0; i < maxLife; i++)
+        {
+            AddLife();
+        }
+        ScoreAPI.GetData((bool s, Data_RequestData d) => {
+            if (s)
+            {
+                highscore = d.high_score;
+            }
         });
     }
 
@@ -141,7 +154,30 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
-        Destroy(lifeContainer.GetChild(lifeContainer.childCount - 1).gameObject);
+        if(lifes>=5)
+            Destroy(lifeContainer[1].GetChild(lifeContainer[1].childCount - 1).gameObject);
+
+        else
+            Destroy(lifeContainer[0].GetChild(lifeContainer[0].childCount - 1).gameObject);
+
+    }
+    public void AddLife()
+    {
+        lifes++;
+        if (lifes > maxLife)
+        {
+            lifes = maxLife;
+        }
+        else
+        {
+            if (lifes > 5)
+                Instantiate(livePrefab, lifeContainer[1]);
+
+            else
+                Instantiate(livePrefab, lifeContainer[0]);
+            
+        }
+        //Destroy(lifeContainer.GetChild(lifeContainer.childCount - 1).gameObject);
     }
     public void SlowTime(float amount,float duration)
     {
@@ -253,7 +289,7 @@ public class GameManager : MonoBehaviour
             cannonDamageAmount +=2;
         }
 
-
+        AddLife();
         StopCoroutine(nameof(SpawnBombsCouroutine));
         StartCoroutine(nameof(SpawnBombsCouroutine));
     }
@@ -275,7 +311,7 @@ public class GameManager : MonoBehaviour
         paused = false;
     }
 
-    void setHighScore(TMP_Text highscroreTextUI)
+    void setGameOverHighScore(TMP_Text highscroreTextUI)
     {
         ScoreAPI.GetData((bool s, Data_RequestData d) => {
             if (s)
@@ -293,6 +329,17 @@ public class GameManager : MonoBehaviour
             }
         });
     }
+    
+    void setHighScore(TMP_Text highscroreTextUI)
+    {
+        if (score >= highscore)
+        {
+            highscore = score;
+
+        }
+        highscroreTextUI.text = highscore.ToString();
+    }
+
     public void AddScore(int amount)
     {
         score += amount ;
